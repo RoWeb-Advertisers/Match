@@ -12,13 +12,12 @@
 
 --!strict
 
-local Match = {}
-
 --=========================
 -- // SERVICES
 --=========================
 
 local MemoryStoreService = game:GetService("MemoryStoreService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local MessagingService = game:GetService("MessagingService")
 local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
@@ -26,8 +25,21 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 --=========================
+-- // Instances
+--=========================
+
+local RemotesFolder = ReplicatedStorage:FindFirstChild("Remotes")
+if not RemotesFolder then error('Could not find "Remotes" in ReplicatedStorage.') return end
+
+local TeleportingRemote = Instance.new("RemoteEvent", RemotesFolder)
+TeleportingRemote.Name = "Teleport"
+
+
+--=========================
 -- // DATA
 --=========================
+
+local Match = {}
 
 Match.Data = {
 	playerQueueKeys = {}, -- // Stores the timestamp for each player based on their UserId and their modes
@@ -635,6 +647,7 @@ function Match:HandleTeleportRequest(data: any): ()
 	for _, userId in playerIds do
 		local player = Players:GetPlayerByUserId(userId)
 		if player then
+			TeleportingRemote:FireClient(player) -- if you can give me the local scripts for this I can help!
 			table.insert(playersToTeleport, player)
 		end
 	end
